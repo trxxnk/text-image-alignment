@@ -1,0 +1,79 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyCharm
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Virtual Environment
+venv/
+env/
+.env
+.venv
+*env*/
+*venv*/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model files
+/models
+
+# Storage (database, logs, etc.)
+*.db
+/storage
+
+# Data
+/data
+
+# Hugging Face
+.huggingface/
+
+# Weights & Biases
+wandb/
+
+# MLFlow
+mlruns/
+
+# Кэш
+*.cache
+.cache/
+
+# Docker
+docker-compose.override.yml
+
+# Логи
+*.log
+logs/
+
+# Конфигурационные файлы
+config_local.yaml
+config_private.py

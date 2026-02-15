@@ -54,6 +54,9 @@ Thumbs.db
 # Data
 /data
 
+# Temp
+*temp*
+
 # Hugging Face
 .huggingface/
 
@@ -77,3 +80,6 @@ logs/
 # Конфигурационные файлы
 config_local.yaml
 config_private.py
+
+# Random
+/random

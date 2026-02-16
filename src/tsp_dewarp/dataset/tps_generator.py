@@ -58,7 +58,8 @@ class TPSDatasetGenerator:
             base_grid = self._build_base_grid(H, W)
             warped_grid = self.pipeline.apply_points(base_grid, H, W)
 
-            delta = warped_grid - base_grid
+            delta = base_grid - warped_grid
+
 
             # нормализуем
             delta_norm = delta.copy()

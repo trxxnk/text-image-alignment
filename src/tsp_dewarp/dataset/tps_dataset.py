@@ -1,5 +1,5 @@
 import json
-import cv2
+from PIL import Image
 import torch
 import numpy as np
 from pathlib import Path
@@ -37,7 +37,7 @@ class TPSDataset(Dataset):
 
         # --- load image ---
         img_path = Path(item["warped"])
-        img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
+        img = Image.open(str(img_path))
 
         if img is None:
             raise RuntimeError(f"Failed to load image: {img_path}")
@@ -50,6 +50,6 @@ class TPSDataset(Dataset):
 
         # --- load deltaTPS ---
         delta = np.array(item["deltaTPS"], dtype=np.float32)  # (25, 2)
-        delta = torch.from_numpy(delta)
+        delta = torch.from_numpy(delta).flatten()
 
         return img, delta

@@ -28,7 +28,7 @@ class TPSDatasetGenerator:
         grid = np.array([(x, y) for y in ys for x in xs], dtype=np.float32)
         return grid
 
-    def generate(self):
+    def generate(self, n: int = 1):
         metadata = []
 
         for img_path in self.input_dir.glob("*"):
@@ -38,43 +38,44 @@ class TPSDatasetGenerator:
 
             H, W = img.shape[:2]
 
-            # 1️⃣ Сэмплируем параметры
-            self.pipeline.sample(self.rng, H, W)
+            for i in range(n):
+                # 1️⃣ Сэмплируем параметры
+                self.pipeline.sample(self.rng, H, W)
 
-            # 2️⃣ Строим remap
-            map_x, map_y = self.pipeline.build_remap(H, W)
+                # 2️⃣ Строим remap
+                map_x, map_y = self.pipeline.build_remap(H, W)
 
-            # 3️⃣ Применяем к изображению
-            warped = cv2.remap(
-                img,
-                map_x,
-                map_y,
-                interpolation=cv2.INTER_CUBIC,
-                borderMode=cv2.BORDER_CONSTANT,
-                borderValue=255
-            )
+                # 3️⃣ Применяем к изображению
+                warped = cv2.remap(
+                    img,
+                    map_x,
+                    map_y,
+                    interpolation=cv2.INTER_CUBIC,
+                    borderMode=cv2.BORDER_CONSTANT,
+                    borderValue=255
+                )
 
-            # 4️⃣ Вычисляем deltaTPS
-            base_grid = self._build_base_grid(H, W)
-            warped_grid = self.pipeline.apply_points(base_grid, H, W)
+                # 4️⃣ Вычисляем deltaTPS
+                base_grid = self._build_base_grid(H, W)
+                warped_grid = self.pipeline.apply_points(base_grid, H, W)
 
-            delta = base_grid - warped_grid
+                delta = base_grid - warped_grid
 
 
-            # нормализуем
-            delta_norm = delta.copy()
-            delta_norm[:, 0] /= (W - 1)
-            delta_norm[:, 1] /= (H - 1)
+                # нормализуем
+                delta_norm = delta.copy()
+                delta_norm[:, 0] /= (W - 1)
+                delta_norm[:, 1] /= (H - 1)
 
-            # 5️⃣ Сохраняем изображение
-            out_path = self.output_dir / (img_path.stem + '_warped' + img_path.suffix)
-            cv2.imwrite(str(out_path), warped)
+                # 5️⃣ Сохраняем изображение
+                out_path = self.output_dir / (img_path.stem + f'_warped_{i+1}' + img_path.suffix)
+                cv2.imwrite(str(out_path), warped)
 
-            metadata.append({
-                "original": str(img_path),
-                "warped": str(out_path),
-                "deltaTPS": delta_norm.tolist()
-            })
+                metadata.append({
+                    "original": str(img_path),
+                    "warped": str(out_path),
+                    "deltaTPS": delta_norm.tolist()
+                })
 
         # 6️⃣ Сохраняем JSON
         with open(self.output_dir / "metadata.json", "w") as f:

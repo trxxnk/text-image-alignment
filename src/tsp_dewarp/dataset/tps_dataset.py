@@ -50,6 +50,6 @@ class TPSDataset(Dataset):
 
         # --- load deltaTPS ---
         delta = np.array(item["deltaTPS"], dtype=np.float32)  # (25, 2)
-        delta = torch.from_numpy(delta).flatten()
+        delta = torch.from_numpy(delta)
 
         return img, delta

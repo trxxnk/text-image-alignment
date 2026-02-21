@@ -19,6 +19,7 @@ class Compose:
     def build_remap(self, H, W):
         grid_y, grid_x = np.meshgrid(np.arange(H), np.arange(W), indexing="ij")
         pts = np.stack([grid_x.ravel(), grid_y.ravel()], axis=1)
+        pts = pts.astype(np.float32)
 
         pts = self.apply_points(pts, H, W)
 

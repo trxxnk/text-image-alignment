@@ -67,12 +67,13 @@ class TPSDatasetGenerator:
                 delta_norm[:, 1] /= (H - 1)
 
                 # 5️⃣ Сохраняем изображение
-                out_path = self.output_dir / (img_path.stem + f'_warped_{i}' + img_path.suffix)
+                warped_img_name = (img_path.stem + f'_warped_{i}' + img_path.suffix)
+                out_path = self.output_dir / warped_img_name
                 cv2.imwrite(str(out_path), warped)
 
                 metadata.append({
-                    "original": str(img_path),
-                    "warped": str(out_path),
+                    "original": str(img_path.name),
+                    "warped": str(warped_img_name),
                     "deltaTPS": delta_norm.tolist()
                 })
 

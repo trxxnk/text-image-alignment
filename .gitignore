@@ -54,6 +54,9 @@ Thumbs.db
 # Data
 /data
 
+# Images
+/images
+
 # Temp
 *temp*
 

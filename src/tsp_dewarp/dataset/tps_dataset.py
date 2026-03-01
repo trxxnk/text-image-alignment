@@ -26,7 +26,7 @@ class TPSDataset(Dataset):
         if not meta_path.exists():
             raise FileNotFoundError("metadata.json not found")
 
-        with open(meta_path, "r") as f:
+        with open(meta_path, "r", encoding='utf-8') as f:
             self.samples = json.load(f)
 
     def __len__(self):
@@ -36,7 +36,10 @@ class TPSDataset(Dataset):
         item = self.samples[idx]
 
         # --- load image ---
-        img_path = Path(item["warped"])
+        img_path = self.dataset_dir / Path(item["warped"])
+        import os
+        img_path = os.path.join(str(self.dataset_dir), str(item["warped"]))
+        print(img_path)
         img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
 
         if img is None:

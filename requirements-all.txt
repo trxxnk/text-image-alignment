@@ -1,5 +1,7 @@
 # Python 3.12.4
 
+# pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
 # Работа с изображениями
 # (маппинг, транформации, визуализации и т.д.)
 PyMuPDF==1.27.1

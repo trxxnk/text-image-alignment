@@ -37,9 +37,6 @@ class TPSDataset(Dataset):
 
         # --- load image ---
         img_path = self.dataset_dir / Path(item["warped"])
-        import os
-        img_path = os.path.join(str(self.dataset_dir), str(item["warped"]))
-        print(img_path)
         img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
 
         if img is None:
@@ -52,7 +49,7 @@ class TPSDataset(Dataset):
             raise RuntimeError("Transformation cannot be `None`!")
 
         # --- load deltaTPS ---
-        delta = np.array(item["deltaTPS"], dtype=np.float32)  # (25, 2)
+        delta = np.array(item["deltaTPS"], dtype=np.float32)
         delta = torch.from_numpy(delta)
 
         return img, delta

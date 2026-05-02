@@ -7,6 +7,12 @@ from typing import List
 
 
 class BaseTransform:
+    def __init__(self):
+        self.strength = 1.0
+
+    def set_strength(self, strength):
+        self.strength = strength
+
     def sample(self, rng: np.random.Generator, H: int, W: int):
         """Сэмплирование случайных параметров"""
         pass

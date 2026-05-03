@@ -87,3 +87,8 @@ config_private.py
 # Random
 /random
 prompts.md
+
+# Архивы
+*.tar*
+*.gz*
+*.zip

@@ -6,3 +6,4 @@ opencv-python
 matplotlib
 Pillow
 mlflow
+dagshub

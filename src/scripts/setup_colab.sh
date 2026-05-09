@@ -1,55 +1,26 @@
-#!/bin/bash
+# Setup Colab Notebook
 
 set -e  # остановка при ошибке
 
-echo "===== START SETUP ====="
+echo "===== START SETUP COLAB ====="
 
-# ===== 1. Клонирование репозитория =====
-if [ -d "text-image-alignment" ]; then
-  echo "Repo already exists, pulling updates..."
-  cd "text-image-alignment"
-  git pull
-else
-  echo "Cloning repository..."
-  git clone https://github.com/trxxnk/text-image-alignment.git
-  cd text-image-alignment
-fi
+# ===== 1. Установка зависимостей =====
+echo "[1/2] Installing dependencies..."
+pip install -q -r requirements-colab.txt
 
-echo "Current dir: $(pwd)"
-
-# ===== 2. Установка зависимостей =====
-echo "Installing dependencies..."
-pip install -r requirements-colab.txt
-
-
-# ===== 3. Подключение Google Drive =====
-echo "Mounting Google Drive..."
-python3 - <<EOF
-from google.colab import drive
-drive.mount('/content/drive')
-EOF
-
-# ===== 4. Распаковка датасета =====
+# ===== 2. Распаковка датасета =====
+echo "[2/2] Download & Unzip dataset..."
 DATASET_ZIP="/content/drive/MyDrive/data_generated_v3.tar.gz"
-DATASET_DIR="/content/text-image-alignment/data"
+DATASET_DIR="./data/generated"
 
-echo "Preparing dataset..."
-
-mkdir -p $DATASET_DIR
+mkdir -p "$DATASET_DIR"
 
 if [ -f "$DATASET_ZIP" ]; then
   echo "Extracting dataset..."
   tar -xzf $DATASET_ZIP -C $DATASET_DIR
+  echo "Success: Dataset extracted to $DATASET_DIR"
 else
-  echo "Dataset tar.gz NOT FOUND at $DATASET_ZIP"
+  echo "!!! ERROR: Dataset tar.gz NOT FOUND at $DATASET_ZIP"
 fi
 
-# ===== 5. Проверка путей =====
-python3 - <<EOF
-import os
-os.chdir("/content/text-image-alignment/")
-from tsp_dewarp.dataset import TPSDataset
-print("✅ Imports OK")
-EOF
-
-echo "===== SETUP DONE ====="
+echo "===== SETUP COLAB DONE ====="

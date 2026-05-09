@@ -19,5 +19,6 @@ scipy==1.16.3
 # Jupyter
 ipywidgets
 
-# Mlflow
+# Отслеживание эскпериментов
 mlflow
+dagshub

@@ -87,6 +87,7 @@ config_private.py
 # Random
 /random
 prompts.md
+/artifacts
 
 # Архивы
 *.tar*

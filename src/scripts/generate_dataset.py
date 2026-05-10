@@ -1,7 +1,7 @@
 import argparse
 
-from src.tsp_dewarp.dataset.tps_generator import TPSDatasetGenerator
-from src.tsp_dewarp.transforms import (
+from src.tps_dewarp.dataset.tps_generator import TPSDatasetGenerator
+from src.tps_dewarp.transforms import (
     RandomWaveTransform,
     RandomPerspectiveTransform,
     IdentityTransform,

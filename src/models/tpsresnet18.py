@@ -30,8 +30,7 @@ class TPSResNet18(nn.Module):
         self.regressor = nn.Sequential(
             nn.Linear(512, 256),
             nn.ReLU(inplace=True),
-            nn.Linear(256, num_points * 2),
-            nn.Tanh()   # 🔥 ограничиваем ΔTPS в [-1, 1]
+            nn.Linear(256, num_points * 2)
         )
 
     def forward(self, x):

@@ -5,7 +5,7 @@ from tqdm import tqdm
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor
 
-from src.tsp_dewarp.transforms.compose import Compose
+from src.tps_dewarp.transforms.compose import Compose
 
 
 class TPSDatasetGenerator:

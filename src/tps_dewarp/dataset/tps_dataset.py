@@ -58,18 +58,19 @@ class TPSDataset(Dataset):
         img_path = self.dataset_dir / item["warped"]
 
         if self.cache_images and img_path in self._image_cache:
-            img = self._image_cache[img_path].copy()
+            img = self._image_cache[img_path].clone()
 
         else:
             img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+
+            if img is None:
+                raise RuntimeError(f"Failed to load image: {img_path}")
+
+            if self.transform is not None:
+                img = self.transform(img)
+
             if self.cache_images:
-                self._image_cache[img_path] = img.copy()
-
-        if img is None:
-            raise RuntimeError(f"Failed to load image: {img_path}")
-
-        if self.transform is not None:
-            img = self.transform(img)
+                self._image_cache[img_path] = img.clone()
 
         # ===== load target deltaTPS =====
         delta = torch.tensor(item["deltaTPS"], dtype=torch.float32)

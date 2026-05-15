@@ -10,10 +10,13 @@ class TPSDataset(Dataset):
     def __init__(self,
                  dataset_dir: str,
                  transform=None,
+                 cache_images: bool = False,
                  return_meta: bool = False):
 
         self.dataset_dir = Path(dataset_dir)
         self.transform = transform
+        self.cache_images = cache_images
+        self._image_cache = {}
         self.return_meta = return_meta
 
         meta_path = self.dataset_dir / "metadata.json"
@@ -53,7 +56,14 @@ class TPSDataset(Dataset):
 
         # ===== load image =====
         img_path = self.dataset_dir / item["warped"]
-        img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
+
+        if self.cache_images and img_path in self._image_cache:
+            img = self._image_cache[img_path].copy()
+
+        else:
+            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+            if self.cache_images:
+                self._image_cache[img_path] = img.copy()
 
         if img is None:
             raise RuntimeError(f"Failed to load image: {img_path}")

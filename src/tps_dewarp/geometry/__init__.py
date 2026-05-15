@@ -1,1 +1,1 @@
-from .tps_restore import build_remap_from_delta_tps
+from .tsp_restore import build_remap_from_delta_tps

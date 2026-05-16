@@ -3,6 +3,7 @@ import cv2
 import torch
 import numpy as np
 from pathlib import Path
+from functools import lru_cache
 from torch.utils.data import Dataset
 
 
@@ -11,12 +12,22 @@ class TPSDataset(Dataset):
                  dataset_dir: str,
                  transform=None,
                  cache_images: bool = False,
-                 return_meta: bool = False):
+                 return_meta: bool = False,
+                 lru_cache_maxsize: int | None = 0):
 
         self.dataset_dir = Path(dataset_dir)
         self.transform = transform
-        self.cache_images = cache_images
-        self._image_cache = {}
+        self.lru_cache_maxsize = lru_cache_maxsize
+
+        @lru_cache(maxsize=lru_cache_maxsize)
+        def cached_loader(img_path):
+            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+            if transform is not None:
+                img = transform(img)
+            return img
+
+        self.cached_loader = cached_loader
+
         self.return_meta = return_meta
 
         meta_path = self.dataset_dir / "metadata.json"
@@ -56,21 +67,7 @@ class TPSDataset(Dataset):
 
         # ===== load image =====
         img_path = self.dataset_dir / item["warped"]
-
-        if self.cache_images and img_path in self._image_cache:
-            img = self._image_cache[img_path].clone()
-
-        else:
-            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-
-            if img is None:
-                raise RuntimeError(f"Failed to load image: {img_path}")
-
-            if self.transform is not None:
-                img = self.transform(img)
-
-            if self.cache_images:
-                self._image_cache[img_path] = img.clone()
+        img = self.cached_loader(img_path)
 
         # ===== load target deltaTPS =====
         delta = torch.tensor(item["deltaTPS"], dtype=torch.float32)

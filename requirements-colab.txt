@@ -7,3 +7,4 @@ matplotlib
 Pillow
 mlflow
 dagshub
+PyYAML>=6.0

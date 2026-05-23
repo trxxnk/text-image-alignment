@@ -1,0 +1,56 @@
+# Базовый конфиг обучения (Trainer + MLflow)
+
+experiment:
+  name: TPS_Dewarp
+
+run:
+  name_prefix: train
+
+dataset:
+  dir: data/generated/v3
+  canvas_size: 256
+  spatial_mode: letterbox
+  letterbox_fill: 0.0
+  lru_cache_maxsize: 128
+
+split:
+  seed: 42
+  train_ratio: 0.8
+  val_ratio: 0.1
+
+loader:
+  batch_size: 256
+  num_workers: 2
+
+model:
+  name: TPSResNet18
+  num_points: 81
+  use_coordconv: true
+
+loss:
+  grid_size: 9
+  lambda_smooth: 0.05
+
+optimizer:
+  name: AdamW
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+
+scheduler:
+  name: CosineAnnealingLR
+
+training:
+  epochs: 40
+  grad_clip_norm: 1.0
+  metric_for_best: val_loss
+  tqdm: true
+  l2_canvas_size: 256
+
+checkpoint:
+  dir: models/checkpoints
+
+mlflow:
+  log_params: true
+  log_config_artifact: true
+  log_artifact_on_best: true
+  log_final_model: true

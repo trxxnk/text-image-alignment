@@ -16,6 +16,9 @@ Pillow==12.1.1
 # Построение сплайнов
 scipy==1.16.3
 
+# Config (training YAML)
+PyYAML>=6.0
+
 # Jupyter
 ipywidgets
 

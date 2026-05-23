@@ -19,6 +19,9 @@ scipy==1.16.3
 # Jupyter
 ipywidgets
 
+# Tests (torch/torchvision — как для нейросетей, см. комментарий в начале файла)
+pytest
+
 # Отслеживание эскпериментов
 mlflow
 dagshub

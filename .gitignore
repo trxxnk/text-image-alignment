@@ -26,6 +26,8 @@ MANIFEST
 *.iml
 
 # VS Code
+.cursor
+.cursorignore
 .vscode/
 *.code-workspace
 
@@ -93,3 +95,6 @@ prompts.md
 *.tar*
 *.gz*
 *.zip
+
+# Диплом
+text_latex/

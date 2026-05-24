@@ -33,3 +33,30 @@ def aggregate_val_epoch_metrics(
         if c > 0:
             out[f"val_l2_px_{d}"] = s / c
     return out
+
+
+def quantile_metrics_1d(values: torch.Tensor, prefix: str) -> dict[str, float]:
+    """p50, p95, max для 1D float тензора; ключи с префиксом."""
+    out: dict[str, float] = {}
+    if values.numel() == 0:
+        return out
+    v = values.detach().float().flatten()
+    out[f"{prefix}_p50"] = float(torch.quantile(v, 0.5).item())
+    out[f"{prefix}_p95"] = float(torch.quantile(v, 0.95).item())
+    out[f"{prefix}_max"] = float(v.max().item())
+    return out
+
+
+def per_group_quantiles(
+    per_group_values: dict[str, list[float]],
+    value_prefix: str,
+) -> dict[str, float]:
+    """Для каждой группы: value_prefix_{group}_p95, _max (p50 опционально — добавим p95/max по плану)."""
+    out: dict[str, float] = {}
+    for group, vals in per_group_values.items():
+        if not vals:
+            continue
+        t = torch.tensor(vals, dtype=torch.float32)
+        out[f"{value_prefix}_{group}_p95"] = float(torch.quantile(t, 0.95).item())
+        out[f"{value_prefix}_{group}_max"] = float(t.max().item())
+    return out

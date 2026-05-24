@@ -22,10 +22,11 @@ def save_training_checkpoint(
     metric_for_best: str,
     mlflow_run_id: str | None,
     config_path: str | None = None,
+    scaler_state_dict: dict[str, Any] | None = None,
 ) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
+    payload: dict[str, Any] = {
         "checkpoint_version": CHECKPOINT_VERSION,
         "epoch": int(epoch),
         "model_state_dict": model_state_dict,
@@ -36,6 +37,8 @@ def save_training_checkpoint(
         "mlflow_run_id": mlflow_run_id,
         "config_path": config_path,
     }
+    if scaler_state_dict is not None:
+        payload["scaler_state_dict"] = scaler_state_dict
     torch.save(payload, path)
 
 

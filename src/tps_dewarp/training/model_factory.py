@@ -11,5 +11,10 @@ from src.tps_dewarp.training.config import TrainConfig
 def build_model(cfg: TrainConfig) -> nn.Module:
     name = cfg.model_name
     if name == "TPSResNet18":
-        return TPSResNet18(num_points=cfg.num_points, use_coordconv=cfg.use_coordconv)
+        return TPSResNet18(
+            num_points=cfg.num_points,
+            use_coordconv=cfg.use_coordconv,
+            pretrained=cfg.model_pretrained,
+            output_scale=cfg.tanh_output_scale,
+        )
     raise ValueError(f"Unknown model name: {name!r}")

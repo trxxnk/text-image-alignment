@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -8,12 +9,19 @@ class TPSLossRegularization(nn.Module):
         self.grid_size = int(grid_size)
         self.lambda_smooth = float(lambda_smooth)
 
-    def forward(self, pred, target):
+    def per_sample_loss(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        """Скаляр лосса на каждый элемент батча, shape (B,)."""
         b = pred.size(0)
         pred = pred.view(b, self.grid_size, self.grid_size, 2)
         target = target.view(b, self.grid_size, self.grid_size, 2)
-        data_loss = F.smooth_l1_loss(pred, target)
+        per_el = F.smooth_l1_loss(pred, target, reduction="none")
+        data = per_el.mean(dim=(1, 2, 3))
         dx = pred[:, :, 1:, :] - pred[:, :, :-1, :]
         dy = pred[:, 1:, :, :] - pred[:, :-1, :, :]
-        smooth_loss = dx.norm(dim=-1).mean() + dy.norm(dim=-1).mean()
-        return data_loss + self.lambda_smooth * smooth_loss
+        smooth_x = dx.norm(dim=-1).mean(dim=(1, 2))
+        smooth_y = dy.norm(dim=-1).mean(dim=(1, 2))
+        smooth = smooth_x + smooth_y
+        return data + self.lambda_smooth * smooth
+
+    def forward(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        return self.per_sample_loss(pred, target).mean()

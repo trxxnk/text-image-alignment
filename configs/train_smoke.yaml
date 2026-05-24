@@ -1,10 +1,10 @@
-# Базовый конфиг обучения (Trainer + MLflow)
+# Быстрый smoke-прогон (1 эпоха, малый batch)
 
 experiment:
   name: TPS_Dewarp
 
 run:
-  name_prefix: train
+  name_prefix: smoke
 
 dataset:
   dir: data/generated/v3
@@ -19,10 +19,10 @@ split:
   val_ratio: 0.1
 
 loader:
-  batch_size: 256
-  num_workers: 2
+  batch_size: 8
+  num_workers: 0
   drop_last: true
-  persistent_workers: true
+  persistent_workers: false
   prefetch_factor: 2
 
 model:
@@ -50,19 +50,19 @@ scheduler:
   name: CosineAnnealingLR
 
 training:
-  epochs: 40
-  warmup_epochs: 2
-  use_amp: true
+  epochs: 1
+  warmup_epochs: 0
+  use_amp: false
   grad_clip_norm: 1.0
   metric_for_best: val_l2_px
   tqdm: true
   l2_canvas_size: 256
 
 checkpoint:
-  dir: models/checkpoints
+  dir: models/checkpoints_smoke
 
 mlflow:
   log_params: true
   log_config_artifact: true
-  log_artifact_on_best: true
-  log_final_model: true
+  log_artifact_on_best: false
+  log_final_model: false

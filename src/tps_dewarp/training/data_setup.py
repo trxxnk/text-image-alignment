@@ -42,12 +42,16 @@ def build_tps_dataloaders(
     )
 
     pin = device.type == "cuda"
-    kw = dict(
+    base_kw: dict = dict(
         batch_size=cfg.batch_size,
         num_workers=cfg.num_workers,
         pin_memory=pin,
     )
-    train_loader = DataLoader(train_data, shuffle=True, **kw)
-    val_loader = DataLoader(val_data, shuffle=False, **kw)
-    test_loader = DataLoader(test_data, shuffle=False, **kw)
+    if cfg.num_workers > 0:
+        base_kw["persistent_workers"] = cfg.loader_persistent_workers
+        base_kw["prefetch_factor"] = cfg.loader_prefetch_factor
+
+    train_loader = DataLoader(train_data, shuffle=True, drop_last=cfg.loader_drop_last, **base_kw)
+    val_loader = DataLoader(val_data, shuffle=False, drop_last=False, **base_kw)
+    test_loader = DataLoader(test_data, shuffle=False, drop_last=False, **base_kw)
     return train_loader, val_loader, test_loader

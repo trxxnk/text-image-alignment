@@ -1,0 +1,68 @@
+# U-Net (с нуля) — полный прогон в Colab (GPU)
+
+experiment:
+  name: TPS_Dewarp
+
+run:
+  name_prefix: unet
+
+dataset:
+  dir: data/generated/v3
+  canvas_size: 256
+  spatial_mode: letterbox
+  letterbox_fill: 0.0
+  lru_cache_maxsize: 128
+
+split:
+  seed: 42
+  train_ratio: 0.8
+  val_ratio: 0.1
+
+loader:
+  batch_size: 128
+  num_workers: 2
+  drop_last: true
+  persistent_workers: true
+  prefetch_factor: 2
+
+model:
+  name: UNetTPS
+  num_points: 81
+  use_coordconv: true
+  pretrained: false        # U-Net обучается с нуля
+  tanh_output_scale: 0.25
+
+loss:
+  grid_size: 9
+  lambda_smooth: 0.05
+  difficulty_weights:
+    easy: 1.0
+    medium: 1.2
+    hard: 1.6
+    identity: 0.7
+
+optimizer:
+  name: AdamW
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+
+scheduler:
+  name: CosineAnnealingLR
+
+training:
+  epochs: 40
+  warmup_epochs: 2
+  use_amp: true
+  grad_clip_norm: 1.0
+  metric_for_best: val_l2_px
+  tqdm: true
+  l2_canvas_size: 256
+
+checkpoint:
+  dir: models/checkpoints_unet
+
+mlflow:
+  log_params: true
+  log_config_artifact: true
+  log_artifact_on_best: true
+  log_final_model: true

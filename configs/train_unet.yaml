@@ -19,7 +19,7 @@ split:
   val_ratio: 0.1
 
 loader:
-  batch_size: 128
+  batch_size: 64
   num_workers: 2
   drop_last: true
   persistent_workers: true

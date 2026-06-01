@@ -93,30 +93,38 @@ class UNetTPS(nn.Module):
         in_ch = 3 if use_coordconv else 1
         c1, c2, c3, c4 = base_ch, base_ch * 2, base_ch * 4, base_ch * 8
 
-        self.enc1 = _DoubleConv(in_ch, c1)
-        self.enc2 = _DoubleConv(c1, c2)
-        self.enc3 = _DoubleConv(c2, c3)
+        # stem со stride=2: первый блок работает на H/2, а не на полном H,
+        # что резко снижает память активаций (узкое место для OOM на T4).
+        self.stem = nn.Sequential(
+            nn.Conv2d(in_ch, c1, 3, stride=2, padding=1, bias=False),
+            nn.BatchNorm2d(c1),
+            nn.ReLU(inplace=True),
+        )
+        self.enc1 = _DoubleConv(c1, c1)   # H/2
+        self.enc2 = _DoubleConv(c1, c2)   # H/4
+        self.enc3 = _DoubleConv(c2, c3)   # H/8
         self.pool = nn.MaxPool2d(2)
-        self.bottleneck = _DoubleConv(c3, c4)
+        self.bottleneck = _DoubleConv(c3, c4)  # H/16
 
-        self.up3 = _Up(c4, c3, c3)
-        self.up2 = _Up(c3, c2, c2)
-        self.up1 = _Up(c2, c1, c1)
-        self.head = nn.Conv2d(c1, 2, kernel_size=1)
+        # Декодер поднимаем только до H/4 — этого с запасом хватает для
+        # сэмплирования сетки 9x9 (как в ResUNetTPS), без дорогих карт на H/2 и H.
+        self.up3 = _Up(c4, c3, c3)  # -> H/8
+        self.up2 = _Up(c3, c2, c2)  # -> H/4
+        self.head = nn.Conv2d(c2, 2, kernel_size=1)
 
     def forward(self, x):
         if self.use_coordconv:
             x = _add_coord_channels(x)
 
-        e1 = self.enc1(x)
-        e2 = self.enc2(self.pool(e1))
-        e3 = self.enc3(self.pool(e2))
-        b = self.bottleneck(self.pool(e3))
+        s = self.stem(x)                    # c1, H/2
+        e1 = self.enc1(s)                   # c1, H/2
+        e2 = self.enc2(self.pool(e1))       # c2, H/4
+        e3 = self.enc3(self.pool(e2))       # c3, H/8
+        b = self.bottleneck(self.pool(e3))  # c4, H/16
 
-        d3 = self.up3(b, e3)
-        d2 = self.up2(d3, e2)
-        d1 = self.up1(d2, e1)
-        field = self.head(d1)  # (B,2,H,W)
+        d3 = self.up3(b, e3)                # c3, H/8
+        d2 = self.up2(d3, e2)              # c2, H/4
+        field = self.head(d2)              # (B,2,H/4,W/4)
 
         return _sample_field_on_grid(field, self.grid_size, self.output_scale)
 
